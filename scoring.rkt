@@ -14,3 +14,6 @@
 
 (define (points week-received week-due stars)
   (* (worth stars) (/ (- 14 (max (- week-received week-due) 0)) 14)))
+
+(define (grade-for-total-points points)
+  points)

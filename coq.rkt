@@ -13,54 +13,68 @@
                                           [week (in-naturals)])
                                  (cons chapter (add1 week)))))
 
+(define (partition/automation exercises)
+  (partition
+   (λ (exercise)
+     (match-let ([(list (list name _ _) parts) exercise])
+       (not (zero? (length parts)))))
+   exercises))
+
+;; student turnin chapter -> (setof exercise-names)
+(define (extract student turnin chapter)
+  (with-handlers ([(λ (x) #t) (λ (e)
+                                (displayln e)
+                                (seteq))])
+    (match-let ([(list stdout stdin pid stderr control)
+                 (process (format "/usr/local/bin/coqc -verbose ~a"
+                                  (build-path "students"
+                                              student
+                                              turnin
+                                              (format "~a.v" chapter))))])
+      (begin0
+        (extract-completed (port->lines stdout))
+        (close-input-port stdout)
+        (close-output-port stdin)
+        (close-input-port stderr)))))
+
 ;; chapter exercise -> difficulty (in stars)
 (define (chapter-exercise-difficulty chapter exercise)
-  (match-let ([(list (list _ difficulty _) _) (findf (match-lambda
-                                                       [(list (list exercise _ _) _) #t]
-                                                       [else #f])
-                                                     (assq chapter curriculum))])
-    difficulty))
-  
+  (let ([exercise (findf (match-lambda
+                           [(list (list exercise _ _) _) #t]
+                           [else #f])
+                         (second (assq chapter curriculum)))])
+    (if exercise
+        (match-let ([(list (list _ difficulty _) _) exercise])
+          difficulty)
+        (error 'chapter-exercise-difficulty "exercise ~a not found in chapter ~a" exercise chapter))))
+
 
 ;; student turnin chapter -> (hash exercise score)
 (define (grade-student-turnin-chapter student turnin chapter)
-  (displayln (format "grade-student-turnin-chapter ~a ~a ~a" student turnin chapter))
   (let ([chapter-detail (assq chapter curriculum)])
     (if chapter-detail
-        (match-let ([(list stdout stdin pid stderr control)
-                     (process (format "coqc -verbose ~a"
-                                      (build-path "students"
-                                                  student
-                                                  turnin
-                                                  (format "~a.v" chapter))))])
-          (begin0
-            (let ([proven-set (with-handlers ([(λ (x) #t) (λ (e) (seteq))])
-                                (extract-proven (port->lines stdout)))])
-              (hasheq
+        (let-values ([(automated not-automated) (partition/automation (second chapter-detail))])
+          (let ([proven-set (extract student turnin chapter)])
+            (let ([completed-exercises (filter-map
+                                        (λ (exercise)
+                                          (match-let ([(list (list name _ _) (list parts ...)) exercise])
+                                            (and (andmap
+                                                  (λ (part)
+                                                    (set-member? proven-set part))
+                                                  parts)
+                                                 name)))
+                                        automated)])
+              (make-hasheq
                (map
                 (λ (exercise)
-                  (cons exercise (points turnin
+                  (cons exercise (points (string->number (path->string turnin))
                                          (hash-ref weeks-due chapter)
                                          (chapter-exercise-difficulty chapter exercise))))
-                (let ([x (filter
-                 (λ (x) x)
-                 (map
-                  (λ (exercise)
-                    (match-let ([(list (list name _ _) (list parts ...)) exercise])
-                      (and (andmap
-                            (λ (part)
-                              (set-member? proven-set part))
-                            parts)
-                           name)))
-                  (second chapter-detail)))]) (displayln x) x))))
-            (close-input-port stdout)
-            (close-output-port stdin)
-            (close-input-port stderr)))
+                completed-exercises)))))
         (hasheq))))
 
 ;; student turnin -> (hash chapter (hash exercise score)))
 (define (grade-student-turnin student turnin)
-  (displayln (format "grade-student-turnin ~a ~a" student turnin))
   (foldr
    (λ (chapter scores)
      (hash-set scores chapter (grade-student-turnin-chapter student turnin chapter)))
@@ -88,9 +102,15 @@
       (hash-set chapters chapter (scores-combine-exercises (hash-ref chapters chapter (hasheq))
                                                            exercises))))
   
-  (for/fold ([scores (hasheq)])
-    ([turnin (directory-list (build-path "students" student))])
-    (scores-combine-chapters scores (grade-student-turnin student turnin))))
+  (let ([scores (for/fold ([scores (hasheq)])
+                  ([turnin (directory-list (build-path "students" student))])
+                  (scores-combine-chapters scores (grade-student-turnin student turnin)))])
+    (for/fold ([total-sum 0])
+      ([chapter (in-hash-values scores)])
+      (+ total-sum
+         (for/fold ([chapter-sum 0])
+           ([score (in-hash-values chapter)])
+           (+ chapter-sum score))))))
 
 (for ([student (directory-list "students")])
   (printf "~a\t~a~n" student (grade-student student)))

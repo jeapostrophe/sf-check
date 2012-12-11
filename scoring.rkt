@@ -1,7 +1,8 @@
 #lang racket/base
 (require racket/match)
 
-(provide points)
+(provide points
+         grade-for-total-points)
 
 (define worth
   (match-lambda
@@ -13,7 +14,7 @@
     [else (worth 2)]))
 
 (define (points week-received week-due stars)
-  (* (worth stars) (/ (- 14 (max (- week-received week-due) 0)) 14)))
+  (* (worth stars) (expt 0.9 (max (- week-received week-due) 0))))
 
 (define (grade-for-total-points p)
   (cond

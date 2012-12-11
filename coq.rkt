@@ -121,12 +121,13 @@
   (let ([scores (for/fold ([scores (hasheq)])
                   ([turnin (directory-list (build-path "students" student))])
                   (scores-combine-chapters scores (grade-student-turnin student turnin)))])
-    (for/fold ([total-sum 0])
-      ([chapter (in-hash-values scores)])
-      (+ total-sum
-         (for/fold ([chapter-sum 0])
-           ([score (in-hash-values chapter)])
-           (+ chapter-sum score))))))
+    (grade-for-total-points
+     (for/fold ([total-sum 0])
+       ([chapter (in-hash-values scores)])
+       (+ total-sum
+          (for/fold ([chapter-sum 0])
+            ([score (in-hash-values chapter)])
+            (+ chapter-sum score)))))))
 
 (for ([student (directory-list "students")])
   (printf "~a\t~a~n" student (grade-student student)))

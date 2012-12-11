@@ -13,6 +13,12 @@
                                           [week (in-naturals)])
                                  (cons chapter (add1 week)))))
 
+(define ->path
+  (case-lambda
+    [(student) (build-path "students" student)]
+    [(student turnin) (build-path "students" student turnin)]
+    [(student turnin chapter) (build-path "students" student turnin (format "~a.v" chapter))]))
+
 (define (partition/automation exercises)
   (partition
    (λ (exercise)
@@ -22,15 +28,12 @@
 
 ;; student turnin chapter -> (setof exercise-names)
 (define (extract student turnin chapter)
-  (with-handlers ([(λ (x) #t) (λ (e)
-                                (displayln e)
-                                (seteq))])
+  (with-handlers ([exn:fail? (λ (e)
+                               (printf "error in ~a; ignoring~n" (->path student turnin chapter))
+                               (seteq))])
     (match-let ([(list stdout stdin pid stderr control)
                  (process (format "/usr/local/bin/coqc -verbose ~a"
-                                  (build-path "students"
-                                              student
-                                              turnin
-                                              (format "~a.v" chapter))))])
+                                  (->path student turnin chapter)))])
       (begin0
         (extract-completed (port->lines stdout))
         (close-input-port stdout)
@@ -55,22 +58,35 @@
     (if chapter-detail
         (let-values ([(automated not-automated) (partition/automation (second chapter-detail))])
           (let ([proven-set (extract student turnin chapter)])
-            (let ([completed-exercises (filter-map
+            (let ([automated-completed (filter-map
                                         (λ (exercise)
-                                          (match-let ([(list (list name _ _) (list parts ...)) exercise])
+                                          (match-let ([(list (list name _ _) parts) exercise])
                                             (and (andmap
                                                   (λ (part)
                                                     (set-member? proven-set part))
                                                   parts)
                                                  name)))
-                                        automated)])
+                                        automated)]
+                  [not-automated-completed (filter-map
+                                            (λ (exercise)
+                                              (match-let ([(list (list name _ _) _) exercise])
+                                                (and (set-member? proven-set name)
+                                                     name)))
+                                            not-automated)])
+              (map
+               (λ (exercise-name)
+                 (printf "look at ~a in ~a~n"
+                         exercise-name
+                         (->path student turnin chapter)))
+               not-automated-completed)
               (make-hasheq
                (map
                 (λ (exercise)
-                  (cons exercise (points (string->number (path->string turnin))
-                                         (hash-ref weeks-due chapter)
-                                         (chapter-exercise-difficulty chapter exercise))))
-                completed-exercises)))))
+                  (cons exercise
+                        (points (string->number (path->string turnin))
+                                (hash-ref weeks-due chapter)
+                                (chapter-exercise-difficulty chapter exercise))))
+                automated-completed)))))
         (hasheq))))
 
 ;; student turnin -> (hash chapter (hash exercise score)))
@@ -87,7 +103,7 @@
          [(regexp-match "^(.+)\\.v$" filename)
           => (λ (m) (string->symbol (second m)))]
          [else #f]))
-     (directory-list (build-path "students" student turnin))))))
+     (directory-list (->path student turnin))))))
 
 ;; student -> score
 (define (grade-student student)

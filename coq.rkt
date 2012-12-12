@@ -4,8 +4,14 @@
          racket/port
          racket/set
          racket/system
-         "extract.rkt"
+         "scrape.rkt"
          "scoring.rkt")
+
+; arguments
+; week designation -> total points for week
+; "<name>" table of scores for student: points by week and grade up to that week
+; define-runtime-path
+
 
 (define curriculum (call-with-input-file "curriculum.sexp" read #:mode 'text))
 
@@ -35,7 +41,7 @@
                  (process (format "/usr/local/bin/coqc -verbose ~a"
                                   (->path student turnin chapter)))])
       (begin0
-        (extract-completed (port->lines stdout))
+        (scrape (port->lines stdout))
         (close-input-port stdout)
         (close-output-port stdin)
         (close-input-port stderr)))))

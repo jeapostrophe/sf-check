@@ -2,7 +2,9 @@
 (require racket/list
          racket/match
          racket/port
-         (prefix-in file: "file-scrape.rkt"))
+         racket/pretty
+         racket/runtime-path
+         "file-scrape.rkt")
 
 (define (accumulate-parts scrape)
   (if (empty? scrape)
@@ -27,7 +29,7 @@
 
 ; lines -> list of exercises
 (define (lines->curriculum lines)
-  (scrape->curriculum (file:scrape lines)))
+  (scrape->curriculum (file-scrape lines)))
 
 (define chapters '(Basics
                    Lists
@@ -45,12 +47,16 @@
                    Stlc
                    MoreStlc))
 
-; use define-runtime-path
-(define sf-path (build-path "/Users/kimballg/Downloads/sf"))
-
-(define (chapter-curriculum chapter)
-  (let ([lines (with-input-from-file (build-path sf-path (format "~a.v" chapter)) port->lines #:mode 'text)])
-    (lines->curriculum lines)))
-
-(map list chapters
-     (map chapter-curriculum chapters))
+(match (current-command-line-arguments)
+  [(vector base-path) (pretty-write (map
+                                     list
+                                     chapters
+                                     (map
+                                      (λ (chapter)
+                                        (lines->curriculum
+                                         (file->lines
+                                          (build-path base-path
+                                                      (format "~a.v" chapter))
+                                          #:mode 'text)))
+                                      chapters)))]
+  [(vector) (printf "usage: racket curriculum.rkt [sf-coq-files-base-path]~n")])

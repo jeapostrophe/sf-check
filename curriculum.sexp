@@ -94,7 +94,12 @@
     3
     recommended
     #f
-    (app_nil_end rev_involutive app_ass4 snoc_append distr_rev nonzeros_length))
+    (app_nil_end
+     rev_involutive
+     app_ass4
+     snoc_append
+     distr_rev
+     nonzeros_length))
    (list_design 2 recommended #t ())
    (bag_proofs 2 optional #f (count_member_nonzero remove_decreases_count))
    (bag_count_sum 3 optional #t ())
@@ -110,6 +115,7 @@
      test_beq_natlist2
      test_beq_natlist3
      beq_natlist_refl))
+   (Dictionaries #f extended #t ())
    (dictionary_invariant1 1 #f #f (dictionary_invariant1))
    (dictionary_invariant2 1 #f #f (dictionary_invariant2))))
  (Poly
@@ -133,12 +139,12 @@
    (flat_map 2 recommended #f (flat_map test_flat_map1))
    (implicit_args 2 optional #t ())
    (fold_types_different 1 optional #f (constfun))
-   (silly_ex 2 optional #f (silly_ex))
+   (silly_ex 2 optional #f (silly_ex silly3_firsttry))
    (apply_exercise1 3 recommended #f (rev_exercise1))
    (apply_rewrite 1 #f #f (unfold_example_bad))
    (override_neq 2 #f #f (override_neq))
    (sillyex1 1 #f #f (sillyex1))
-   (sillyex2 1 #f #f (sillyex2))
+   (sillyex2 1 #f #f (sillyex2 beq_nat_eq_FAILED))
    (beq_nat_eq_informal 2 #f #t ())
    (|beq_nat_eq'| 3 #f #f (|beq_nat_eq'|))
    (practice 2 optional #f (beq_nat_0_l beq_nat_0_r))
@@ -331,7 +337,11 @@
    (rtc_rsc_coincide 3 optional #f (rtc_rsc_coincide))))
  (Smallstep
   ((test_step_2 2 #f #f (test_step_2 deterministic normal_form))
-   (value_not_same_as_normal_form 2 optional #f (value_not_same_as_normal_form))
+   (value_not_same_as_normal_form
+    2
+    optional
+    #f
+    (value_not_same_as_normal_form))
    (|value_not_same_as_normal_form'| 3 #f #f (value_not_same_as_normal_form))
    (smallstep_bools 1 #f #f (bool_step_prop1))
    (step_deterministic 2 optional #f (step_deterministic))

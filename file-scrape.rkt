@@ -3,7 +3,7 @@
          racket/match
          racket/set)
 
-(provide scrape)
+(provide file-scrape)
 
 (define (snoc xs x)
   (append xs (list x)))
@@ -90,3 +90,5 @@
           [(start-provable? line)
            => (λ (name) (in-provable lines name))]
           [else (scrape (rest lines))]))))
+
+(define file-scrape scrape)

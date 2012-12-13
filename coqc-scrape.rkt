@@ -1,6 +1,9 @@
 #lang racket/base
-(require racket/list)
-(provide scrape)
+(require racket/file
+         racket/list
+         racket/match
+         racket/system)
+(provide coqc-scrape)
 
 (define (snoc xs x)
   (append xs (list x)))
@@ -85,3 +88,19 @@
           [(start-provable? line)
            => (λ (name) (in-provable (rest lines) name))]
           [else (scrape (rest lines))]))))
+
+(define (coqc-scrape filepath)
+  (let ([temp-output-file (build-path (find-system-path 'temp-dir) "coqc-output")]
+        [temp-error-file (build-path (find-system-path 'temp-dir) "coqc-error")])
+    (match (system/exit-code (format "coqc -verbose ~a > ~a 2> ~a"
+                                     filepath
+                                     temp-output-file
+                                     temp-error-file))
+      [0 (scrape (file->lines temp-output-file #:mode 'text))]
+      [1 (error 'coqc (last (file->lines
+                             temp-output-file
+                             #:mode 'text)))]
+      [_ (error 'coqc (file->string
+                       temp-error-file
+                       #:mode 'text))])))
+  

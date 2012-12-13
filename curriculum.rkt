@@ -2,8 +2,7 @@
 (require racket/list
          racket/match
          racket/port
-         "scrape.rkt")
-(provide lines->curriculum)
+         (prefix-in file: "file-scrape.rkt"))
 
 (define (accumulate-parts scrape)
   (if (empty? scrape)
@@ -28,7 +27,7 @@
 
 ; lines -> list of exercises
 (define (lines->curriculum lines)
-  (scrape->curriculum (scrape lines)))
+  (scrape->curriculum (file:scrape lines)))
 
 (define chapters '(Basics
                    Lists
@@ -47,7 +46,7 @@
                    MoreStlc))
 
 ; use define-runtime-path
-(define sf-path (build-path "/home/kimballg/Documents/sf"))
+(define sf-path (build-path "/Users/kimballg/Downloads/sf"))
 
 (define (chapter-curriculum chapter)
   (let ([lines (with-input-from-file (build-path sf-path (format "~a.v" chapter)) port->lines #:mode 'text)])

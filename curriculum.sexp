@@ -1,12 +1,17 @@
 ((Basics
-  ((andb3 1 #f #f (andb3 test_andb31 test_andb32 test_andb33 test_andb34))
+  ((nandb 1 #f #f (nandb test_nandb1 test_nandb2 test_nandb3 test_nandb4))
+   (andb3 1 #f #f (andb3 test_andb31 test_andb32 test_andb33 test_andb34))
    (factorial 1 #f #f (factorial test_factorial1 test_factorial2))
    (blt_nat 2 #f #f (blt_nat test_blt_nat1 test_blt_nat2 test_blt_nat3))
    (simpl_plus 1 optional #t ())
    (plus_id_exercise 1 #f #f (plus_id_exercise))
    (mult_1_plus 2 recommended #f (mult_1_plus plus_1_neq_0_firsttry))
    (zero_nbeq_plus_1 1 #f #f (zero_nbeq_plus_1))
-   (andb_true_elim2 2 #f #f (andb_true_elim2 plus_0_r_firsttry plus_0_r_secondtry))
+   (andb_true_elim2
+    2
+    #f
+    #f
+    (andb_true_elim2 plus_0_r_firsttry plus_0_r_secondtry))
    (basic_induction 2 recommended #f (mult_0_r plus_n_Sm plus_comm))
    (double_plus 2 #f #f (double_plus))
    (destruct_induction 1 #f #t ())
@@ -29,8 +34,8 @@
      mult_plus_distr_r
      mult_assoc))
    (|plus_swap'| 2 optional #f (|plus_swap'|))
-   (binary 4 recommended #t (bin))
-   (binary_inverse 5 #f #t (normalize))
+   (binary 4 recommended #t ())
+   (binary_inverse 5 #f #t ())
    (decreasing 2 optional #t ())))
  (Lists
   ((snd_fst_is_swap 1 #f #f (snd_fst_is_swap))
@@ -100,12 +105,16 @@
     2
     recommended
     #f
-    (beq_natlist test_beq_natlist1 test_beq_natlist2 test_beq_natlist3 beq_natlist_refl))
+    (beq_natlist
+     test_beq_natlist1
+     test_beq_natlist2
+     test_beq_natlist3
+     beq_natlist_refl))
    (dictionary_invariant1 1 #f #f (dictionary_invariant1))
    (dictionary_invariant2 1 #f #f (dictionary_invariant2))))
  (Poly
   ((combine_checks 1 optional #t ())
-   (split 2 recommended #f (split test_split))
+   (split 2 recommended #t ())
    (hd_opt_poly
     1
     optional
@@ -123,13 +132,13 @@
    (map_rev 3 optional #f (map_rev))
    (flat_map 2 recommended #f (flat_map test_flat_map1))
    (implicit_args 2 optional #t ())
-   (fold_types_different 1 optional #t ())
+   (fold_types_different 1 optional #f (constfun))
    (silly_ex 2 optional #f (silly_ex))
    (apply_exercise1 3 recommended #f (rev_exercise1))
    (apply_rewrite 1 #f #f (unfold_example_bad))
    (override_neq 2 #f #f (override_neq))
    (sillyex1 1 #f #f (sillyex1))
-   (sillyex2 1 #f #f (sillyex2 beq_nat_eq_FAILED))
+   (sillyex2 1 #f #f (sillyex2))
    (beq_nat_eq_informal 2 #f #t ())
    (|beq_nat_eq'| 3 #f #f (|beq_nat_eq'|))
    (practice 2 optional #f (beq_nat_0_l beq_nat_0_r))
@@ -140,7 +149,11 @@
    (split_combine 3 optional #f (sillyfun1))
    (override_same 2 #f #f (override_same))
    (filter_exercise 3 optional #f (filter_exercise))
-   (apply_exercises 3 recommended #f (trans_eq_exercise beq_nat_trans override_permute))
+   (apply_exercises
+    3
+    recommended
+    #f
+    (trans_eq_exercise beq_nat_trans override_permute))
    (fold_length 2 optional #f (fold_length))
    (fold_map 3 recommended #f (fold_map))
    (mumble_grumble 2 optional #t ())
@@ -148,14 +161,22 @@
    (forall_exists_challenge 4 recommended #t ())
    (index_informal 2 optional #t ())))
  (Gen
-  ((gen_dep_practice 3 recommended #f (plus_n_n_injective_take2 index_after_last))
+  ((gen_dep_practice
+    3
+    recommended
+    #f
+    (plus_n_n_injective_take2 index_after_last))
    (index_after_last_informal 3 optional #t ())
    (gen_dep_practice_opt 3 #f #f (|length_snoc'''|))
    (app_length_cons 3 #f #f (app_length_cons))
    (app_length_twice 4 optional #f (app_length_twice))))
  (Prop
   ((varieties_of_beauty 1 #f #f (|eight_is_beautiful'''| |six_is_beautiful'|))
-   (nine_is_beautiful 1 #f #f (nine_is_beautiful |nine_is_beautiful'| |b_plus3'|))
+   (nine_is_beautiful
+    1
+    #f
+    #f
+    (nine_is_beautiful |nine_is_beautiful'| |b_plus3'|))
    (|b_times2'| 3 optional #f (|b_times2'|))
    (b_timesm 2 #f #f (b_timesm))
    (gorgeous_tree 1 #f #f (gorgeous__beautiful_FAILED))
@@ -178,7 +199,7 @@
    (tree 1 #f #t ())
    (mytype 1 #f #t ())
    (foo 1 optional #t ())
-   (|foo'| 1 optional #f (P_m0r b_16_atmpt_2))))
+   (|foo'| 1 optional #f (P_m0r b_16_atmpt_2 b_16_atmpt_3))))
  (Logic
   ((and_assoc 2 #f #f (and_assoc))
    (even__ev 2 recommended #f (even__ev))
@@ -250,7 +271,8 @@
     #f
     (fact_invariant s_execute1 s_execute2 s_compile s_compile_correct))))
  (ImpCEvalFun
-  ((peven 2 optional #t ())
+  ((pup_to_n 2 recommended #f (pup_to_n))
+   (peven 2 optional #t ())
    (ceval_step__ceval_inf 4 #f #t ())
    (ceval__ceval_step 3 recommended #f (ceval__ceval_step))))
  (Equiv
@@ -277,7 +299,11 @@
    (stequiv_aeval 2 optional #f (stequiv_aeval))
    (stequiv_beval 2 optional #f (stequiv_beval |cequiv'|))
    (for_while_equiv 4 optional #t ())
-   (swap_noninterfering_assignments 3 optional #f (swap_noninterfering_assignments))))
+   (swap_noninterfering_assignments
+    3
+    optional
+    #f
+    (swap_noninterfering_assignments))))
  (Hoare
   ((hoare_asgn_weakest 2 #f #f (hoare_asgn_weakest silly1 silly2))
    (hoare_asgn_examples_2 2 #f #t ())
@@ -290,7 +316,11 @@
     #f
     #f
     (hoare_triple hoare_havoc hoare_havoc_weakest subtract_slowly fact_body))
-   (slow_assignment_dec 3 optional #f (slow_assignment_dec slow_assignment_dec_correct))
+   (slow_assignment_dec
+    3
+    optional
+    #f
+    (slow_assignment_dec slow_assignment_dec_correct))
    (factorial_dec 4 optional #t ())))
  (Rel
   ((#f 2 optional #f (|lt_trans''|))
@@ -316,7 +346,8 @@
    (combined_properties 4 #f #f (cmultistep))
    (#f 3 optional #f (par_body_n))))
  (Types
-  ((|normalize_ex'| 1 optional #f (|normalize_ex'| value))
+  ((normalize_ex 1 #f #f (normalize_ex))
+   (|normalize_ex'| 1 optional #f (|normalize_ex'| value))
    (value_is_nf 3 optional #f (value_is_nf))
    (step_deterministic 3 optional #f (step_deterministic))
    (succ_hastype_nat__hastype_nat 1 #f #f (succ_hastype_nat__hastype_nat))
@@ -327,7 +358,8 @@
    (finish_preservation 2 #f #f (preservation))
    (preservation_alternate_proof 3 #f #f (|preservation'|))))
  (Stlc
-  ((step_example3 2 #f #f (step_example3 partial_map))
+  ((step_example3 2 #f #f (step_example3))
+   (typing_example_2_full 2 optional #f (typing_example_2_full))
    (typing_example_3 2 #f #f (typing_example_3))
    (typing_nonexample_3 3 #f #f (typing_nonexample_3))
    (typing_statements 1 optional #t ())

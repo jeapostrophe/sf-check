@@ -1,22 +1,22 @@
 #lang racket/base
 (require racket/match)
 
-(provide points
-         grade-for-total-points)
+(provide exercise-score
+         grade-for-total-score)
 
-(define worth
+(define point-worth
   (match-lambda
     [1 1]
     [2 5]
     [3 15]
     [4 60]
     [5 240]
-    [else (worth 2)]))
+    [else (point-worth 2)]))
 
-(define (points week-received week-due stars)
-  (* (worth stars) (expt 0.9 (max (- week-received week-due) 0))))
-
-(define (grade-for-total-points p)
+(define (exercise-score difficulty lateness)
+  (* (point-worth difficulty) (expt 0.9 lateness)))
+  
+(define (grade-for-total-score p)
   (cond
     [(< p 1500) (exact->inexact (/ p 2000))]
     [(< p 2000) (exact->inexact (+ (/ p 5000) 9/20))]

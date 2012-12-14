@@ -31,17 +31,20 @@
 
 
 
-(define point-worth
+(define score/difficulty
   (match-lambda
     [1 1]
     [2 5]
     [3 15]
     [4 60]
     [5 240]
-    [else (point-worth 2)]))
+    [else (score/difficulty 2)]))
+
+(define (score/lateness score lateness)
+  (* score (expt 0.9 lateness)))
 
 (define (exercise-score difficulty lateness)
-  (* (point-worth difficulty) (expt 0.9 lateness)))
+  (score/lateness (score/difficulty difficulty) lateness))
 
 (define (chapter-score path chapter lateness)
   (let ([sentences (apply seteq (filter-map
@@ -57,9 +60,10 @@
                (set-member? sentences part))
              parts)
             (if manual?
-                (let ([manual-grade-path (path-replace-suffix path (symbol->string exercise))])
+                (let*-values ([(base x y) (split-path path)]
+                              [(manual-grade-path) (build-path base (symbol->string exercise))])
                   (hash-set completed-exercises exercise (and (file-exists? manual-grade-path)
-                                                              (file->value manual-grade-path))))
+                                                              (score/lateness (file->value manual-grade-path) lateness))))
                 (hash-set completed-exercises exercise (exercise-score difficulty lateness)))
             completed-exercises)))))
 

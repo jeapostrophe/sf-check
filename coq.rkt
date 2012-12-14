@@ -10,9 +10,17 @@
 
 (define-runtime-path students-dir "students")
 
+(define (print/w w left right)
+  (let ([left (format "~a" left)]
+        [right (format "~a" right)])
+  (printf "~a~a~a~n"
+          left
+          (make-string (max 0 (- w (string-length left) (string-length right))) #\space)
+          right)))
+
 (define (display-exercises exercises fuel)
   (for ([(exercise score) (in-hash exercises)])
-    (printf "      ~a\t~a~n" (or score "TBD") exercise)))
+    (print/w 80 (format "      ~a" exercise) (or score "-"))))
 
 (define (display-manual/chapter manual/chapter)
   (map
@@ -23,7 +31,7 @@
 (define (display-chapters chapters fuel)
   (for ([(chapter exercises) (in-hash chapters)])
     (let-values ([(total-score manual/chapter) (chapter-total-score exercises)])
-      (printf "    ~a\t~a~n" chapter total-score)
+      (print/w 80 (format"    ~a" chapter) total-score)
       (if (zero? fuel)
           (display-manual/chapter manual/chapter)
           (display-exercises exercises (sub1 fuel))))))
@@ -38,7 +46,7 @@
 (define (display-turnins turnins fuel)
   (for ([(turnin chapters) (in-hash turnins)])
     (let-values ([(total-score manual/turnin) (turnin-total-score chapters)])
-      (printf "  ~a\t~a~n" turnin total-score)
+      (print/w 80 (format "  ~a" turnin) total-score)
       (if (zero? fuel)
           (display-manual/turnin manual/turnin)
           (display-chapters chapters (sub1 fuel))))))
@@ -67,13 +75,18 @@
                                     (string->number turnin))))]
          [deltas (turnin-scores->deltas turnin-scores)])
       (let-values ([(total-score manual/total) (total-score deltas)])
-        (printf "~a\t~a\t~a~n" student total-score (total-score->grade total-score))
+        (print/w 80 student (total-score->grade total-score))
+        (print/w 80 "total" total-score)
         (if (zero? fuel)
             (display-manual/total manual/total)
             (display-turnins deltas (sub1 fuel)))))))
 
-(display-all 3)
-
-#;(match (current-command-line-arguments)
+(match (current-command-line-arguments)
   [(vector (regexp #px"\\d+" (list x))) (display-all (string->number x))]
+  [(vector (or "-h" "--help") _ ...) (printf "usage: racket coq.rkt [0|1|2|3]
+The single numeric argument specifies the \"depth\" to print detail:
+  0  semester
+  1  turnin
+  2  chapter
+  3  exercise~n")]
   [_ (display-all 0)])

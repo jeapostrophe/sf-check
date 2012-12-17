@@ -40,7 +40,7 @@
                      (string->symbol (third match))))))
 
 (define (end-def/fix? line)
-  (regexp-match #px"end\\." line))
+  (regexp-match #px"\\.$" line))
 
 (define (in-def/fix lines spec)
   (if (empty? lines)
@@ -55,7 +55,8 @@
   (let ([match (or (regexp-match #px"^(Example)\\s+([\\w']+)[^\\w']" line)
                    (regexp-match #px"^(Fact)\\s+([\\w']+)[^\\w']" line)
                    (regexp-match #px"^(Lemma)\\s+([\\w']+)[^\\w']" line)
-                   (regexp-match #px"^(Theorem)\\s+([\\w']+)[^\\w']" line))])
+                   (regexp-match #px"^(Theorem)\\s+([\\w']+)[^\\w']" line)
+                   (regexp-match #px"^(Corollary)\\s+([\\w']+)[^\\w']" line))])
     (and match (list (string->symbol (string-downcase (second match)))
                      (string->symbol (third match))))))
 

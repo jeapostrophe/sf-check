@@ -1,10 +1,12 @@
 #lang racket/base
 (require racket/list
          racket/match
-         racket/port
+         racket/file
          racket/pretty
          racket/runtime-path
          "file-scrape.rkt")
+
+; this file generates a curriculum heuristically
 
 (define (accumulate-parts scrape)
   (if (empty? scrape)

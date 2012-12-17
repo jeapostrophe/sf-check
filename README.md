@@ -16,14 +16,14 @@ for manual grading. This is explained in more depth later.
 
 The grading system assumes the existence of a directory hierarchy
 
-    students/*student-name*/*turnin*/*chapter*.v
+    students/<student-name>/<turnin>/<chapter>.v
 
 where *student-name* is arbitrary, *turnin* is one of `0.0`, `0.5`, `1.0`, ..., `15.0`, and *chapter* 
 exactly matches one of the 15 chapters in the course.
 
 Grades are calculated by running
 
-    racket coq.rkt [*depth*]
+    racket coq.rkt [<depth>]
 
 where *depth* can be 0-3 and defaults to 0. The *depth* parameter refers to the depth of the report 
 where values correspond to the following point breakdowns
@@ -38,13 +38,13 @@ component have been completed. Any such exercises will be noted by the system.
 
 Output roughly follows the format
 
-    *student-name*              *grade*
-    total             *semester-points*
-      *turnin*          *turnin-points*
-        *chapter*      *chapter-points*
+    <student-name>              <grade>
+    total             <semester-points>
+      <turnin>          <turnin-points>
+        <chapter>      <chapter-points>
         ...
       ...
-      *flagged-exercise*
+      <flagged-exercise>
       ...
 
 where *semester-grade* * 100 gives the percentage from which the letter grade is determined, and 
@@ -59,8 +59,7 @@ natural workflow of keeping a working directory of chapters and copying a chapte
 the present turnin when submitting, ensuring that the local hierarchy mirrors the instructor's as 
 much as possible.
 
-Curriculum
-----------
+## Curriculum
 
 The `curriculum.sexp` file contains exercise information for each chapter. Exercise entries match the 
 following pattern:

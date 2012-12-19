@@ -18,7 +18,7 @@
 
 (define-runtime-path curriculum-file "curriculum.sexp")
 
-(define curriculum (call-with-input-file "curriculum.sexp" read #:mode 'text))
+(define curriculum (file->value curriculum-file))
 
 (define weeks-due (hasheq 'Basics       0.5
                           'Lists        1.5

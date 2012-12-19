@@ -67,25 +67,24 @@ Most exercises in SF are accompanied by a difficulty rating expressed in stars. 
 corresponds to an expected amount of time an exercise of that difficulty should take to complete, 
 which is given in the SF introductory chapter. This correspondence, as given, is
 
-  stars  duration
-  1      1-2 minutes
-  2      5-10 minutes
-  3      15-30 minutes
-  4      60-120 minutes
+    stars  duration
+    1      1-2 minutes
+    2      5-10 minutes
+    3      15-30 minutes
+    4      60-120 minutes
 
 However, some exercises are designated 5-star difficulty and some are not designated at all. We assume 
 the correspondence
 
-  stars  duration
-  5      240-480 minutes
-  *      5-10 minutes
+    stars  duration
+    5      240-480 minutes
+    *      5-10 minutes
 
 which may be adjusted to better reflect reality.
 
-The point worth of an exercise is the lower bound of the given range.
-
-There are just under 2000 points worth of 1-, 2-, and 3-star exercises. Completing only these in a 
-timely way will earn you a solid B.
+The point worth of an exercise is the lower bound of the given range. There are just under 2000 
+points worth of 1-, 2-, and 3-star exercises. Completing only these in a timely way will earn you 
+a solid B.
 
 ###Lateness
 

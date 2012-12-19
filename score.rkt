@@ -46,20 +46,20 @@
 
 
 
-(define score/difficulty
+(define point-worth
   (match-lambda
     [1 1]
     [2 5]
     [3 15]
     [4 60]
     [5 240]
-    [else (score/difficulty 2)]))
+    [else (point-worth 2)]))
 
 (define (score/lateness score lateness)
   (* score (expt 0.9 lateness)))
 
 (define (exercise-score difficulty lateness)
-  (score/lateness (score/difficulty difficulty) lateness))
+  (score/lateness (point-worth difficulty) lateness))
 
 (define (chapter-score path chapter lateness)
   (let ([sentences (apply seteq (filter-map

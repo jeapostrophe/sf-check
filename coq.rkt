@@ -4,6 +4,7 @@
          racket/runtime-path
          racket/set
          racket/system
+         racket/format
          "delta.rkt"
          "score.rkt")
 
@@ -75,7 +76,12 @@
                                     (string->number turnin))))]
          [deltas (turnin-scores->deltas turnin-scores)])
       (let-values ([(total-score manual/total) (total-score deltas)])
-        (print/w 80 student (total-score->grade total-score))
+        (define grade (total-score->grade total-score))
+        (print/w 80 student 
+                 (format "~a (~a)" 
+                         (~a (real->decimal-string grade 2) 
+                             #:min-width 5 #:left-pad-string "0" #:align 'right)
+                         (convert-to-letter grade)))
         (print/w 80 "total" total-score)
         (if (zero? fuel)
             (display-manual/total manual/total)

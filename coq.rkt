@@ -62,9 +62,10 @@
 (define (display-all fuel)
   (for ([student (directory-list students-dir)])
     (let* ([turnins
-            (sort (map
-                   path->string
-                   (directory-list (build-path students-dir student)))
+            (sort (filter string->number
+                          (map
+                           path->string
+                           (directory-list (build-path students-dir student))))
                   <
                   #:key string->number)]
          [turnin-scores

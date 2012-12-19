@@ -19,9 +19,23 @@
 
 (define curriculum (call-with-input-file "curriculum.sexp" read #:mode 'text))
 
-(define weeks-due (make-hasheq (for/list ([chapter (map first curriculum)]
-                                          [week (in-naturals)])
-                                 (cons chapter (add1 week)))))
+(define weeks-due (hasheq 'Basics       0.5
+                          'Lists        1.5
+                          'Poly         2.5
+                          'Gen          3.5
+                          'Prop         4.5
+                          'Logic        5.5
+                          'Imp          6.5
+                          'ImpCEvalFun  7.5
+                          'Extraction   7.5
+                          'Equiv        8.5
+                          'Hoare        9.5
+                          'Rel          10.5
+                          'HoareAsLogic 10.5
+                          'Smallstep    11.5
+                          'Types        12.5
+                          'Stlc         13.5
+                          'MoreStlc     14.5))
 
 (define chapter-exercises (make-hasheq (map
                                         (λ (chapter)
@@ -88,7 +102,7 @@
       (cons chapter
             (chapter-score (build-path path (format "~a.v" chapter))
                            chapter
-                           (max (- turnin (hash-ref weeks-due chapter)) 0))))
+                           (- turnin (hash-ref weeks-due chapter)))))
     (filter-map
      (λ (entry)
        (let ([match (regexp-match #px"^(\\w+)\\.v$" (path->string entry))])

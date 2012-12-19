@@ -56,7 +56,7 @@ where *numeric-grade* * 100 gives the percentage from which *letter-grade* is de
 There are approximately 5000 points available among all the exercises. For total points earned, 
 the numeric grade function is this graph:
 
-![numeric grade function](grade-for-points.png)
+![numeric grade function](sf-check/blob/master/grade-for-points.png)
 
 There are two components which determine the points earned for a completed exercise: difficulty and 
 lateness.

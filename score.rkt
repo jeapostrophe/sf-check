@@ -78,7 +78,8 @@
                 (let*-values ([(base x y) (split-path path)]
                               [(manual-grade-path) (build-path base (symbol->string exercise))])
                   (hash-set completed-exercises exercise (and (file-exists? manual-grade-path)
-                                                              (score/lateness (file->value manual-grade-path) lateness))))
+                                                              (* (file->value manual-grade-path)
+                                                                 (exercise-score difficulty lateness)))))
                 (hash-set completed-exercises exercise (exercise-score difficulty lateness)))
             completed-exercises)))))
 

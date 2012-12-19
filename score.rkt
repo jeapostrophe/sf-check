@@ -8,7 +8,8 @@
          "delta.rkt")
 
 
-(provide chapter-score
+(provide point-worth
+         chapter-score
          turnin-score
          chapter-total-score
          turnin-total-score

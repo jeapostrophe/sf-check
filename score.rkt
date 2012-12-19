@@ -13,7 +13,8 @@
          chapter-total-score
          turnin-total-score
          total-score
-         total-score->grade)
+         total-score->grade
+         convert-to-letter)
 
 (define-runtime-path curriculum-file "curriculum.sexp")
 
@@ -145,3 +146,18 @@
     [else (let ([a (* 3/20 (exp 8/3))]
                 [b -1/750])
             (- 1 (* a (exp (* b p)))))]))
+
+(define (convert-to-letter ng)
+  (cond
+    [(> ng 0.93) "A"]
+    [(> ng 0.9) "A-"]
+    [(> ng 0.86) "B+"]
+    [(> ng 0.83) "B"]
+    [(> ng 0.8) "B-"]
+    [(> ng 0.76) "C+"]
+    [(> ng 0.73) "C"]
+    [(> ng 0.7) "C-"]
+    [(> ng 0.66) "D+"]
+    [(> ng 0.63) "D"]
+    [(> ng 0.6) "D-"]
+    [else "F"]))

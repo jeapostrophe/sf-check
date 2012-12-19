@@ -124,6 +124,6 @@ should be proven, perhaps like:
     Fact <name>: true = true.
     Proof. reflexivity. Qed.
 
-`(*part-name* ...)` is a list of the parts that comprise the exercise. For <manual?> exercises, this is 
+`(<part-name> ...)` is a list of the parts that comprise the exercise. For <manual?> exercises, this is 
 often a singleton list which item has the same name as the exercise itself. In such cases, a proposition 
 with this name is seldom found in the text, but should be added, as in the *manual?* description.

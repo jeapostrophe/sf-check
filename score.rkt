@@ -57,7 +57,7 @@
     [else (point-worth 2)]))
 
 (define (score/lateness score lateness)
-  (* score (expt 0.9 lateness)))
+  (* score (expt 0.95 (* lateness 2))))
 
 (define (exercise-score difficulty lateness)
   (score/lateness (point-worth difficulty) lateness))

@@ -127,3 +127,10 @@ should be proven, perhaps like:
 `(<part-name> ...)` is a list of the parts that comprise the exercise. For <manual?> exercises, this is 
 often a singleton list which item has the same name as the exercise itself. In such cases, a proposition 
 with this name is seldom found in the text, but should be added, as in the *manual?* description.
+
+In all but a few cases, the names match those in the text. The
+problems are in the `Smallstep` chapter where the text uses the
+exercise and part name `value_not_same_as_normal_form` three
+times. The grading system assumes that you will rename them
+`value_not_same_as_normal_form`, `value_not_same_as_normal_form2`, and
+`value_not_same_as_normal_form3`.

@@ -400,12 +400,12 @@
     optional
     #f
     (value_not_same_as_normal_form))
-   (value_not_same_as_normal_form
+   (value_not_same_as_normal_form2
     2
     optional
     #f
-    (value_not_same_as_normal_form))
-   (|value_not_same_as_normal_form'| 3 #f #f (value_not_same_as_normal_form))
+    (value_not_same_as_normal_form2))
+   (value_not_same_as_normal_form3 3 #f #f (value_not_same_as_normal_form3))
    (smallstep_bools 1 #f #t (smallstep_bools))
    (progress_bool 3 recommended #f (strong_progress))
    (step_deterministic 2 optional #f (step_deterministic))

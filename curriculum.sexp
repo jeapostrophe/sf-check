@@ -308,6 +308,8 @@
    (peven 2 optional #t (peven))
    (ceval_step__ceval_inf 4 #f #t (ceval_step__ceval_inf))
    (ceval__ceval_step 3 recommended #f (ceval__ceval_step))))
+ (Extraction
+  ())
  (Equiv
   ((pairs_equiv 2 optional #t (pairs_equiv))
    (equiv_classes 3 #f #t (equiv_classes))
@@ -391,6 +393,8 @@
    (le_step 2 optional #f (le_step))
    (rsc_trans 2 optional #f (rsc_trans))
    (rtc_rsc_coincide 3 optional #f (rtc_rsc_coincide))))
+ (HoareAsLogic
+  ((hoare_proof_sound 2 #f #f (hoare_proof_sound))))
  (Smallstep
   ((test_step_2 2 #f #f (test_step_2))
    (redo_determinism 3 recommended #t (redo_determinism))

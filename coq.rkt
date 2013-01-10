@@ -11,17 +11,19 @@
 
 (define-runtime-path students-dir "students")
 
+(define WIDTH 78)
+
 (define (print/w w left right)
   (let ([left (format "~a" left)]
         [right (format "~a" right)])
-  (printf "~a~a~a~n"
-          left
-          (make-string (max 0 (- w (string-length left) (string-length right))) #\space)
-          right)))
+    (printf "~a~a~a~n"
+            left
+            (make-string (max 0 (- w (string-length left) (string-length right))) #\space)
+            right)))
 
 (define (display-exercises exercises fuel)
   (for ([(exercise score) (in-hash exercises)])
-    (print/w 80 (format "      ~a" exercise) (or score "-"))))
+    (print/w WIDTH (format "      ~a" exercise) (or (format-score score) "-"))))
 
 (define (display-manual/chapter manual/chapter)
   (map
@@ -32,10 +34,10 @@
 (define (display-chapters chapters fuel)
   (for ([(chapter exercises) (in-hash chapters)])
     (let-values ([(total-score manual/chapter) (chapter-total-score exercises)])
-      (print/w 80 (format"    ~a" chapter) total-score)
+      (print/w WIDTH (format"    ~a" chapter) (format-score total-score))
       (if (zero? fuel)
-          (display-manual/chapter manual/chapter)
-          (display-exercises exercises (sub1 fuel))))))
+        (display-manual/chapter manual/chapter)
+        (display-exercises exercises (sub1 fuel))))))
 
 (define (display-manual/turnin manual/turnin)
   (map
@@ -47,10 +49,10 @@
 (define (display-turnins turnins fuel)
   (for ([(turnin chapters) (in-hash turnins)])
     (let-values ([(total-score manual/turnin) (turnin-total-score chapters)])
-      (print/w 80 (format "  ~a" turnin) total-score)
+      (print/w WIDTH (format "  ~a" turnin) (format-score total-score))
       (if (zero? fuel)
-          (display-manual/turnin manual/turnin)
-          (display-chapters chapters (sub1 fuel))))))
+        (display-manual/turnin manual/turnin)
+        (display-chapters chapters (sub1 fuel))))))
 
 (define (display-manual/total manual/total)
   (map
@@ -58,6 +60,13 @@
      (printf "~a~n" (first turnin))
      (display-manual/turnin (rest turnin)))
    manual/total))
+
+(define (format-score grade)
+  (~a (real->decimal-string grade 2)
+      #:min-width 7 #:left-pad-string " " #:align 'right))
+(define (format-grade grade)
+  (~a (real->decimal-string grade 2)
+      #:min-width 5 #:left-pad-string "0" #:align 'right))
 
 (define (display-all fuel)
   (for ([student (directory-list students-dir)])
@@ -68,25 +77,24 @@
                            (directory-list (build-path students-dir student))))
                   <
                   #:key string->number)]
-         [turnin-scores
-          (for/fold ([turnin-scores (hash)])
-            ([turnin turnins])
-            (hash-set turnin-scores
-                      turnin
-                      (turnin-score (build-path students-dir student turnin)
-                                    (string->number turnin))))]
-         [deltas (turnin-scores->deltas turnin-scores)])
+           [turnin-scores
+            (for/fold ([turnin-scores (hash)])
+                ([turnin turnins])
+              (hash-set turnin-scores
+                        turnin
+                        (turnin-score (build-path students-dir student turnin)
+                                      (string->number turnin))))]
+           [deltas (turnin-scores->deltas turnin-scores)])
       (let-values ([(total-score manual/total) (total-score deltas)])
         (define grade (total-score->grade total-score))
-        (print/w 80 student 
-                 (format "~a (~a)" 
-                         (~a (real->decimal-string grade 2) 
-                             #:min-width 5 #:left-pad-string "0" #:align 'right)
+        (print/w WIDTH student
+                 (format "~a (~a)"
+                         (format-grade grade)
                          (convert-to-letter grade)))
-        (print/w 80 "total" total-score)
+        (print/w WIDTH "total" (format-score total-score))
         (if (zero? fuel)
-            (display-manual/total manual/total)
-            (display-turnins deltas (sub1 fuel)))))))
+          (display-manual/total manual/total)
+          (display-turnins deltas (sub1 fuel)))))))
 
 (match (current-command-line-arguments)
   [(vector (regexp #px"\\d+" (list x))) (display-all (string->number x))]

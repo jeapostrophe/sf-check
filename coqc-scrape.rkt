@@ -28,7 +28,9 @@
       (cond
         [(end-inductive? line) (cons (snoc spec 'defined) (scrape (rest lines)))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
-        [else (in-inductive (rest lines) spec)]))))
+        [else 
+         ;; (eprintf "in-inductive: ignoring: ~a\n" line)
+         (in-inductive (rest lines) spec)]))))
 
 (define (start-def/fix? line)
   (let ([match (or (regexp-match #px"^(Definition)\\s+([\\w']+)[^\\w']" line)
@@ -47,7 +49,11 @@
         [(admit? line) (cons (snoc spec 'admitted) (scrape (rest lines)))]
         [(end-def/fix? line) (cons (snoc spec 'completed) (scrape (rest lines)))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
-        [else (in-def/fix (rest lines) spec)]))))
+        [(start-provable? line)
+         (cons (snoc spec 'completed) (scrape lines))]
+        [else
+         ;; (eprintf "in-def/fix: ignoring: ~a\n" line)
+         (in-def/fix (rest lines) spec)]))))
 
 (define (start-provable? line)
   (let ([match (or (regexp-match #px"^(Example)\\s+([\\w']+)[^\\w']" line)
@@ -72,7 +78,9 @@
         [(admit? line) (cons (snoc spec 'admitted) (scrape (rest lines)))]
         [(qed? line) (cons (snoc spec 'completed) (scrape (rest lines)))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
-        [else (in-provable (rest lines) spec)]))))
+        [else
+         ;; (eprintf "in-provable: ignoring: ~a\n" line)
+         (in-provable (rest lines) spec)]))))
 
 ;; coqc verbose output as lines -> list of coq sentences
 (define (scrape lines)
@@ -88,7 +96,9 @@
          => (λ (name) (in-def/fix (rest lines) name))]
         [(start-provable? line)
          => (λ (name) (in-provable (rest lines) name))]
-        [else (scrape (rest lines))]))))
+        [else
+         ;; (eprintf "scrape: ignoring: ~a\n" line)
+         (scrape (rest lines))]))))
 
 (define (coqc-scrape filepath)
   (let ([temp-output-file (build-path (find-system-path 'temp-dir) "coqc-output")]

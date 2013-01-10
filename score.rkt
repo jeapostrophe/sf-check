@@ -65,8 +65,12 @@
 (define (chapter-score path chapter lateness)
   (let ([sentences (apply seteq (filter-map
                                  (match-lambda
-                                  [(list _ name 'completed) name]
-                                  [_ #f])
+                                  [(and x (list _ name 'completed))
+                                   ;; (eprintf "found: ~a\n" x)
+                                   name]
+                                  [x 
+                                   ;; (eprintf "dropped: ~a\n" x)
+                                   #f])
                                  (coqc-scrape path)))])
     (for/fold ([completed-exercises (hasheq)])
         ([(exercise info) (in-hash (hash-ref chapter-exercises chapter))])

@@ -81,7 +81,11 @@
                       parts)
                    (if manual?
                      (let*-values ([(base x y) (split-path path)]
-                                   [(manual-grade-path) (build-path base (symbol->string exercise))])
+                                   [(manual-grade-path) 
+                                    (build-path base
+                                                (format ".~a.~a" 
+                                                        chapter
+                                                        exercise))])
                        (hash-set completed-exercises exercise (and (file-exists? manual-grade-path)
                                                                    (* (file->value manual-grade-path)
                                                                       (exercise-score difficulty lateness)))))

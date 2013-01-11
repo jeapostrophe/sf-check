@@ -23,7 +23,7 @@
 
 (define (display-exercises exercises fuel)
   (for ([(exercise score) (in-hash exercises)])
-    (print/w WIDTH (format "      ~a" exercise) (or (format-score score) "-"))))
+    (print/w WIDTH (format "      ~a" exercise) (or (and score (format-score score)) "-"))))
 
 (define (display-manual/chapter manual/chapter)
   (map

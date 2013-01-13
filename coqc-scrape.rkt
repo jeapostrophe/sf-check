@@ -111,13 +111,9 @@
               temp-error-file))
     (match (system/exit-code cmd-line)
       [0 (scrape (file->lines temp-output-file #:mode 'text))]
-      [1 (error 'coqc "~v gave: ~a"
-                cmd-line
-                (last (file->lines
-                       temp-output-file
-                       #:mode 'text)))]
-      [_ (error 'coqc "~v gave: ~a"
+      [_ (error 'coqc "~v gave\nstdout: ~a\nstderr: ~a"
                 cmd-line
                 (file->string
-                 temp-error-file
-                 #:mode 'text))])))
+                 temp-output-file)
+                (file->string
+                 temp-error-file))])))

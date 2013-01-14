@@ -70,38 +70,55 @@
 
 (define (display-all fuel)
   (for ([student (directory-list students-dir)])
-    (let* ([turnins
-            (sort (filter string->number
-                          (map
-                           path->string
-                           (directory-list (build-path students-dir student))))
-                  <
-                  #:key string->number)]
-           [turnin-scores
-            (for/fold ([turnin-scores (hash)])
-                ([turnin turnins])
-              (hash-set turnin-scores
-                        turnin
-                        (turnin-score (build-path students-dir student turnin)
-                                      (string->number turnin))))]
-           [deltas (turnin-scores->deltas turnin-scores)])
-      (let-values ([(total-score manual/total) (total-score deltas)])
-        (define grade (total-score->grade total-score))
-        (print/w WIDTH student
-                 (format "~a (~a)"
-                         (format-grade grade)
-                         (convert-to-letter grade)))
-        (print/w WIDTH "total" (format-score total-score))
-        (if (zero? fuel)
-          (display-manual/total manual/total)
-          (display-turnins deltas (sub1 fuel)))))))
+    (display-student fuel student)))
 
-(match (current-command-line-arguments)
-  [(vector (regexp #px"\\d+" (list x))) (display-all (string->number x))]
-  [(vector (or "-h" "--help") _ ...) (printf "usage: racket coq.rkt [0|1|2|3]
+(define (display-student fuel student)
+  (let* ([turnins
+          (sort (filter string->number
+                        (map
+                         path->string
+                         (directory-list (build-path students-dir student))))
+                <
+                #:key string->number)]
+         [turnin-scores
+          (for/fold ([turnin-scores (hash)])
+              ([turnin turnins])
+            (hash-set turnin-scores
+                      turnin
+                      (turnin-score (build-path students-dir student turnin)
+                                    (string->number turnin))))]
+         [deltas (turnin-scores->deltas turnin-scores)])
+    (let-values ([(total-score manual/total) (total-score deltas)])
+      (define grade (total-score->grade total-score))
+      (print/w WIDTH student
+               (format "~a (~a)"
+                       (format-grade grade)
+                       (convert-to-letter grade)))
+      (print/w WIDTH "total" (format-score total-score))
+      (if (zero? fuel)
+        (display-manual/total manual/total)
+        (display-turnins deltas (sub1 fuel))))))
+
+(module+ main
+  (define depth 0)
+  (define user #f)
+  (for ([a (in-vector (current-command-line-arguments))])
+    (match a
+      [(? string? (app string->number (and (not #f) n)))
+       (set! depth n)]
+      [(? string? u)
+       (set! user u)]
+      [_
+       (eprintf "got: ~v\n" a)
+       (eprintf "usage: [0|1|2|3]
 The single numeric argument specifies the \"depth\" to print detail:
   0  semester
   1  turnin
   2  chapter
-  3  exercise~n")]
-  [_ (display-all 0)])
+  3  exercise~n")
+       (exit 1)]))
+  (cond
+    [user
+     (display-student depth user)]
+    [else
+     (display-all depth)]))

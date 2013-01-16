@@ -11,7 +11,7 @@
 
 (define-runtime-path students-dir "students")
 
-(define WIDTH 78)
+(define WIDTH 77)
 
 (define (print/w w left right)
   (let ([left (format "~a" left)]

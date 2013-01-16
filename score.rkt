@@ -66,10 +66,10 @@
   (let ([sentences (apply seteq (filter-map
                                  (match-lambda
                                   [(and x (list _ name 'completed))
-                                   ;; (eprintf "found: ~a\n" x)
+                                   (deprintf "found: ~a\n" x)
                                    name]
                                   [x 
-                                   ;; (eprintf "dropped: ~a\n" x)
+                                   (deprintf "dropped: ~a\n" x)
                                    #f])
                                  (coqc-scrape path)))])
     (for/fold ([completed-exercises (hasheq)])

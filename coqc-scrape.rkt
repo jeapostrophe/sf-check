@@ -4,7 +4,10 @@
          racket/path
          racket/match
          racket/system)
-(provide coqc-scrape)
+(provide coqc-scrape
+         deprintf)
+
+(define deprintf void)
 
 (define (snoc xs x)
   (append xs (list x)))
@@ -29,7 +32,7 @@
         [(end-inductive? line) (cons (snoc spec 'defined) (scrape (rest lines)))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
         [else 
-         ;; (eprintf "in-inductive: ignoring: ~a\n" line)
+         (deprintf "in-inductive: ignoring: ~a\n" line)
          (in-inductive (rest lines) spec)]))))
 
 (define (start-def/fix? line)
@@ -46,13 +49,16 @@
     (cons (snoc spec 'unspecified) (scrape lines))
     (let ([line (first lines)])
       (cond
-        [(admit? line) (cons (snoc spec 'admitted) (scrape (rest lines)))]
-        [(end-def/fix? line) (cons (snoc spec 'completed) (scrape (rest lines)))]
-        [(designates-error? line) => (λ (message) (error 'scrape message))]
-        [(start-provable? line)
+        [(admit? line)
+         (cons (snoc spec 'admitted) (scrape (rest lines)))]
+        [(end-def/fix? line)
+         (cons (snoc spec 'completed) (scrape (rest lines)))]
+        [(designates-error? line) =>
+         (λ (message) (error 'scrape message))]
+        [(start-something? line)
          (cons (snoc spec 'completed) (scrape lines))]
         [else
-         ;; (eprintf "in-def/fix: ignoring: ~a\n" line)
+         (deprintf "in-def/fix: ignoring: ~a\n" line)
          (in-def/fix (rest lines) spec)]))))
 
 (define (start-provable? line)
@@ -79,8 +85,13 @@
         [(qed? line) (cons (snoc spec 'completed) (scrape (rest lines)))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
         [else
-         ;; (eprintf "in-provable: ignoring: ~a\n" line)
+         (deprintf "in-provable: ignoring: ~a\n" line)
          (in-provable (rest lines) spec)]))))
+
+(define (start-something? l)
+  (or (start-inductive? l)
+      (start-def/fix? l)
+      (start-provable? l)))
 
 ;; coqc verbose output as lines -> list of coq sentences
 (define (scrape lines)
@@ -97,7 +108,7 @@
         [(start-provable? line)
          => (λ (name) (in-provable (rest lines) name))]
         [else
-         ;; (eprintf "scrape: ignoring: ~a\n" line)
+         (deprintf "scrape: ignoring: ~a\n" line)
          (scrape (rest lines))]))))
 
 (define (coqc-scrape filepath)

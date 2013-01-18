@@ -133,4 +133,7 @@ problems are in the `Smallstep` chapter where the text uses the
 exercise and part name `value_not_same_as_normal_form` three
 times. The grading system assumes that you will rename them
 `value_not_same_as_normal_form`, `value_not_same_as_normal_form2`, and
-`value_not_same_as_normal_form3`.
+`value_not_same_as_normal_form3`. Similarly, there are three instances
+of `step_deterministic`, which should be named `step_deterministic`,
+`step_deterministic2`, and `step_deterministic3`. There are two
+instances of `strong_progress` and should be renamed as well.

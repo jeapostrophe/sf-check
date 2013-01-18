@@ -31,7 +31,7 @@
       (cond
         [(end-inductive? line) (cons (snoc spec 'defined) (scrape (rest lines)))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
-        [else 
+        [else
          (deprintf "in-inductive: ignoring: ~a\n" line)
          (in-inductive (rest lines) spec)]))))
 
@@ -112,19 +112,31 @@
          (scrape (rest lines))]))))
 
 (define (coqc-scrape filepath)
-  (let ([temp-output-file (build-path (find-system-path 'temp-dir) "coqc-output")]
-        [temp-error-file (build-path (find-system-path 'temp-dir) "coqc-error")])
-    (define cmd-line
-      (format "coqc -I ~a -verbose ~a > ~a 2> ~a"
-              (path-only filepath)
-              filepath
-              temp-output-file
-              temp-error-file))
-    (match (system/exit-code cmd-line)
-      [0 (scrape (file->lines temp-output-file #:mode 'text))]
-      [_ (error 'coqc "~v gave\nstdout: ~a\nstderr: ~a"
-                cmd-line
-                (file->string
-                 temp-output-file)
-                (file->string
-                 temp-error-file))])))
+  (define output-file (path-add-suffix filepath #"output"))
+  (define error-file (path-add-suffix filepath #"error"))
+  (cond
+    [(and (file-exists? output-file)
+          (file-exists? error-file)
+          (> (file-or-directory-modify-seconds output-file)
+             (file-or-directory-modify-seconds filepath))
+          (> (file-or-directory-modify-seconds error-file)
+             (file-or-directory-modify-seconds filepath)))
+     (scrape (file->lines output-file #:mode 'text))]
+    [else
+     (define cmd-line
+       (format "coqc -I ~a -verbose ~a > ~a 2> ~a"
+               (path-only filepath)
+               filepath
+               output-file
+               error-file))
+     (match (system/exit-code cmd-line)
+       [0 (coqc-scrape filepath)]
+       [_
+        (define output-s (file->string output-file))
+        (define error-s (file->string error-file))
+        (delete-file output-file)
+        (delete-file error-file)
+        (error 'coqc "~v gave\nstdout: ~a\nstderr: ~a"
+               cmd-line
+               output-s
+               error-s)])]))

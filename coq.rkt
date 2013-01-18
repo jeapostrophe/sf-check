@@ -8,7 +8,6 @@
          "delta.rkt"
          "score.rkt")
 
-
 (define-runtime-path students-dir "students")
 
 (define WIDTH 77)
@@ -21,9 +20,11 @@
             (make-string (max 0 (- w (string-length left) (string-length right))) #\space)
             right)))
 
-(define (display-exercises exercises fuel)
-  (for ([(exercise score) (in-hash exercises)])
-    (print/w WIDTH (format "      ~a" exercise) (or (and score (format-score score)) "-"))))
+(define (display-exercises ordered-exercises exercise->score fuel)
+  (for ([exercise (in-list ordered-exercises)])
+    (let/ec esc
+      (define score (hash-ref exercise->score exercise esc))
+      (print/w WIDTH (format "      ~a" exercise) (or (and score (format-score score)) "-")))))
 
 (define (display-manual/chapter manual/chapter)
   (map
@@ -31,13 +32,16 @@
      (printf "    ~a~n" exercise))
    manual/chapter))
 
-(define (display-chapters chapters fuel)
-  (for ([(chapter exercises) (in-hash chapters)])
-    (let-values ([(total-score manual/chapter) (chapter-total-score exercises)])
-      (print/w WIDTH (format"    ~a" chapter) (format-score total-score))
-      (if (zero? fuel)
-        (display-manual/chapter manual/chapter)
-        (display-exercises exercises (sub1 fuel))))))
+(define (display-chapters chapter->exercises fuel)
+  (for ([chapter (in-list ordered-chapters)])
+    (define exercises (hash-ref chapter->exercises chapter hasheq))
+    (when (not (zero? (hash-count exercises)))
+      (let-values ([(total-score manual/chapter) (chapter-total-score exercises)])
+        (print/w WIDTH (format"    ~a" chapter) (format-score total-score))
+        (if (zero? fuel)
+          (display-manual/chapter manual/chapter)
+          (display-exercises (hash-ref chapter->ordered-exercises chapter)
+                             exercises (sub1 fuel)))))))
 
 (define (display-manual/turnin manual/turnin)
   (map
@@ -46,8 +50,9 @@
      (display-manual/chapter (rest chapter)))
    manual/turnin))
 
-(define (display-turnins turnins fuel)
-  (for ([(turnin chapters) (in-hash turnins)])
+(define (display-turnins turnins turnin->chapters fuel)
+  (for ([turnin (in-list turnins)])
+    (define chapters (hash-ref turnin->chapters turnin))
     (let-values ([(total-score manual/turnin) (turnin-total-score chapters)])
       (print/w WIDTH (format "  ~a" turnin) (format-score total-score))
       (if (zero? fuel)
@@ -65,7 +70,7 @@
   (~a (real->decimal-string grade 2)
       #:min-width 7 #:left-pad-string " " #:align 'right))
 (define (format-grade grade)
-  (~a (real->decimal-string grade 2)
+  (~a (real->decimal-string (* 100 grade) 2)
       #:min-width 5 #:left-pad-string "0" #:align 'right))
 
 (define (display-all fuel)
@@ -97,7 +102,7 @@
       (print/w WIDTH "total" (format-score total-score))
       (if (zero? fuel)
         (display-manual/total manual/total)
-        (display-turnins deltas (sub1 fuel))))))
+        (display-turnins turnins deltas (sub1 fuel))))))
 
 (module+ main
   (define depth 0)

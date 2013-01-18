@@ -15,7 +15,9 @@
          turnin-total-score
          total-score
          total-score->grade
-         convert-to-letter)
+         convert-to-letter
+         ordered-chapters
+         chapter->ordered-exercises)
 
 (define-runtime-path curriculum-file "curriculum.sexp")
 
@@ -39,12 +41,22 @@
           'Types        12.5
           'Stlc         13.5
           'MoreStlc     14.5))
+(define ordered-chapters
+  (sort (hash-keys weeks-due)
+        <
+        #:key (λ (c) (hash-ref weeks-due c))))
 
 (define chapter-exercises
   (make-hasheq (map
                 (λ (chapter)
                   (cons (first chapter)
                         (make-hasheq (first (rest chapter)))))
+                curriculum)))
+(define chapter->ordered-exercises
+  (make-hasheq (map
+                (λ (chapter)
+                  (cons (first chapter)
+                        (map first (first (rest chapter)))))
                 curriculum)))
 
 (define point-worth

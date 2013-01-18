@@ -398,7 +398,7 @@
  (Smallstep
   ((test_step_2 2 #f #f (test_step_2))
    (redo_determinism 3 recommended #t (redo_determinism))
-   (step_deterministic 2 optional #f (step_deterministic))
+   (step_deterministic2 2 optional #f (step_deterministic2))
    (value_not_same_as_normal_form
     3
     optional
@@ -411,8 +411,8 @@
     (value_not_same_as_normal_form2))
    (value_not_same_as_normal_form3 3 #f #f (value_not_same_as_normal_form3))
    (smallstep_bools 1 #f #t (smallstep_bools))
-   (progress_bool 3 recommended #f (strong_progress))
-   (step_deterministic 2 optional #f (step_deterministic))
+   (progress_bool 3 recommended #f (strong_progress2))
+   (step_deterministic3 2 optional #f (step_deterministic3))
    (smallstep_bool_shortcut 2 #f #f (bool_step_prop4_holds))
    (properties_of_altered_step 3 optional #t (properties_of_altered_step))
    (test_multistep_2 1 optional #f (test_multistep_2))

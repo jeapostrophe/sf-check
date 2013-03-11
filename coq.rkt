@@ -74,7 +74,11 @@
       #:min-width 5 #:left-pad-string "0" #:align 'right))
 
 (define (display-all fuel)
-  (for ([student (directory-list students-dir)])
+  (for ([student (filter ; only get directories that don't start with '.'
+                   (lambda (path)
+                     (and (not (eq? (string-ref (path->string path) 0) #\. ))
+                          (directory-exists? (build-path students-dir path))))
+                   (directory-list students-dir))])
     (display-student fuel student)))
 
 (define (display-student fuel student)

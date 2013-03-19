@@ -364,7 +364,7 @@
    (hoare_asgn_example4 2 #f #f (hoare_asgn_example4))
    (swap_exercise 3 #f #t (swap_exercise))
    (hoarestate1 3 optional #t (hoarestate1))
-   (if1_hoare 4 recommended #t (if1_hoare hoare_if1_good))
+   (if1_hoare 4 recommended #t (if1_hoare hoare_if1))
    (hoare_repeat 4 #f #t (hoare_repeat ex1_repeat_works))
    (himp_hoare 3 #f #f (havoc_pre hoare_havoc hoare_havoc_weakest))
    (reduce_to_zero_correct 2 #f #f (reduce_to_zero_correct))

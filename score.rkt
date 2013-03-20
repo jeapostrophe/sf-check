@@ -80,7 +80,7 @@
                                   [(and x (list _ name 'completed))
                                    (deprintf "found: ~a\n" x)
                                    name]
-                                  [x 
+                                  [x
                                    (deprintf "dropped: ~a\n" x)
                                    #f])
                                  (coqc-scrape path)))])
@@ -93,9 +93,9 @@
                       parts)
                    (if manual?
                      (let*-values ([(base x y) (split-path path)]
-                                   [(manual-grade-path) 
+                                   [(manual-grade-path)
                                     (build-path base
-                                                (format ".~a.~a" 
+                                                (format ".~a.~a"
                                                         chapter
                                                         exercise))])
                        (hash-set completed-exercises exercise (and (file-exists? manual-grade-path)
@@ -157,13 +157,48 @@
                                                     (cons (cons turnin manual/turnin) manual/total)))))])
     (values total-score (reverse manual/total))))
 
+(define (first-score-part p)
+  (* (/ .7 first-break) p))
+(define (second-score-part p)
+  (+ (* (/ (- .9 (first-score-part first-break)) (- second-break first-break)) (- p first-break))
+     (first-score-part first-break)))
+(define (third-score-part p)
+  (+ (* (/ (- 1 (second-score-part second-break)) (- 5000 second-break)) (- p second-break))
+     (second-score-part second-break)))
+
+(define first-break 1300)
+(define second-break 2000)
+
 (define (total-score->grade p)
   (cond
-    [(< p 1500) (exact->inexact (/ p 2000))]
-    [(< p 2000) (exact->inexact (+ (/ p 5000) 9/20))]
-    [else (let ([a (* 3/20 (exp 8/3))]
-                [b -1/750])
-            (- 1 (* a (exp (* b p)))))]))
+    [(< p first-break)
+     (exact->inexact (first-score-part p))]
+    [(< p second-break)
+     (exact->inexact
+      (second-score-part p))]
+    [else
+     (exact->inexact
+      (third-score-part p))]))
+
+(module+ main
+  (require plot)
+  (plot-file
+   #:x-label "total points"
+   #:y-label "numeric grade"
+   #:y-min 0
+   #:y-max 1
+   (list (points (list (list first-break (total-score->grade first-break))
+                       (list second-break (total-score->grade second-break))))
+         (function total-score->grade 0 5000
+                   #:label "numeric grade for total points"
+                   #:color "green")
+         (function first-score-part 0 first-break
+                   #:color "blue")
+         (function second-score-part first-break second-break
+                   #:color "red")
+         (function third-score-part second-break 5000
+                   #:color "black"))
+   "grade-for-points.png"))
 
 (define (convert-to-letter ng)
   (cond

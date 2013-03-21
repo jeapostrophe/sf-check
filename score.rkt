@@ -180,6 +180,7 @@
      (exact->inexact
       (third-score-part p))]))
 
+#;
 (module+ main
   (require plot)
   (plot-file

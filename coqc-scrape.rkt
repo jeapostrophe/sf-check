@@ -83,6 +83,7 @@
       (cond
         [(admit? line) (cons (snoc spec 'admitted) (scrape (rest lines)))]
         [(qed? line) (cons (snoc spec 'completed) (scrape (rest lines)))]
+        [(start-something? line) (cons (snoc spec 'completed) (scrape lines))]
         [(designates-error? line) => (λ (message) (error 'scrape message))]
         [else
          (deprintf "in-provable: ignoring: ~a\n" line)

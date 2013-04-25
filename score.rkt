@@ -61,15 +61,17 @@
 
 (define point-worth
   (match-lambda
-   [1 1]
-   [2 5]
-   [3 15]
-   [4 60]
-   [5 240]
+   [1   1   2]
+   [2   5  10]
+   [3  15  30]
+   [4  60 120]
+   [5 240 480]
    [else (point-worth 2)]))
 
 (define (score/lateness score lateness)
-  (* score (expt 0.95 (* lateness 2))))
+  ;; XXX Don't penalize lateness... theorems never get easier
+  (* score (expt 0.95 (* lateness 2)))
+  score)
 
 (define (exercise-score difficulty lateness)
   (score/lateness (point-worth difficulty) lateness))
@@ -158,15 +160,25 @@
     (values total-score (reverse manual/total))))
 
 (define (first-score-part p)
-  (* (/ .7 first-break) p))
+  (* (/ first-score first-break) p))
 (define (second-score-part p)
-  (+ (* (/ (- .9 (first-score-part first-break)) (- second-break first-break)) (- p first-break))
+  (+ (* (/ (- second-score (first-score-part first-break)) (- second-break first-break)) (- p first-break))
      (first-score-part first-break)))
 (define (third-score-part p)
   (+ (* (/ (- 1 (second-score-part second-break)) (- 5000 second-break)) (- p second-break))
      (second-score-part second-break)))
 
+;; New
+#;#;#;#;
+(define first-break 1400)
+(define first-score .9)
+(define second-score .93)
+(define second-break 1800)
+
+;; Old
 (define first-break 1300)
+(define first-score .7)
+(define second-score .9)
 (define second-break 2000)
 
 (define (total-score->grade p)
@@ -179,13 +191,13 @@
     [else
      (exact->inexact
       (third-score-part p))]))
-
 #;
 (module+ main
   (require plot)
   (plot-file
    #:x-label "total points"
    #:y-label "numeric grade"
+   #:legend-anchor 'bottom-right
    #:y-min 0
    #:y-max 1
    (list (points (list (list first-break (total-score->grade first-break))
